@@ -72,15 +72,13 @@ const findInDb = async (
 	return selectedResults;
 };
 
+const formatAnswer = (item) => {
+	return `<b>${item?.title}</b>\n${MDN_URL + item?.url}\n${item?.description}
+		`;
+};
+
 const textAnswer = async (text = "") => {
 	const notFountText = `Nothing was found by query <i>${text}</i>`;
-
-	const formatAnswer = (item) => {
-		return `<b>${item?.title}</b>\n${MDN_URL + item?.url}\n${
-			item?.description
-		}
-		`;
-	};
 
 	if (text.startsWith(ID_PREFIX)) {
 		const query = text.replace(ID_PREFIX, "");
@@ -118,7 +116,7 @@ const formKeyboard = (limit = 5) => {
 				callback_data: "first",
 			},
 		],
-		[...pages.slice(0, 5)],
+		[...pages.slice(0, limit)],
 		[
 			{
 				text: "▶️",
@@ -132,14 +130,21 @@ const formKeyboard = (limit = 5) => {
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-bot.start((ctx) =>
+bot.start((ctx) => {
+	console.log("start");
 	ctx.reply(`
-    Hello ${ctx.from.first_name}!
-    Find something about javascript and web development.
-`)
-);
+    Hello ${ctx.from.first_name}!\nFind something about javascript and web development.
+`);
+});
 
 bot.on("text", async (ctx) => {
+	const myId = ctx.botInfo.id;
+	const messageFromBot = ctx.message?.via_bot?.id === myId;
+
+	if (messageFromBot) {
+		return;
+	}
+
 	try {
 		const text = ctx.message.text;
 		const result = await textAnswer(text);
@@ -147,13 +152,19 @@ bot.on("text", async (ctx) => {
 
 		const keyboard = formKeyboard();
 
-		await ctx.replyWithHTML(result, Markup.keyboard(keyboard));
+		await ctx.replyWithHTML(result, Markup.inlineKeyboard(keyboard), {
+			// reply_markup: Markup.inlineKeyboard(keyboard),
+			// disable_web_page_preview: true,
+		});
 	} catch (e) {
+		console.log("context error:", ctx);
+		console.log("error", e);
 		await ctx.reply(`An error occurred`);
 	}
 });
 
 bot.on("inline_query", async (ctx) => {
+	console.log("inline_query chat", ctx.chat);
 	const text = ctx.inlineQuery.query;
 	console.log("inline query", text);
 
@@ -174,22 +185,31 @@ bot.on("inline_query", async (ctx) => {
 		id: idx,
 		title: item.title,
 		description: item.description,
-		message_text: ID_PREFIX + item.title,
-		url: MDN_URL + item.url,
+		input_message_content: {
+			message_text: formatAnswer(item),
+			parse_mode: "HTML",
+		},
+		disable_web_page_preview: true,
+		// url: MDN_URL + item.url,
+		hide_url: true,
 	}));
 
 	ctx.answerInlineQuery(answer);
 
-	bot.on("chosen_inline_result", async (ctx1) => {
-		const text = ctx1.chosenInlineResult.query;
-		console.log("chosen_inline_result:", text);
+	// bot.on("chosen_inline_result", async (ctx1) => {
+	// 	console.log("chosen_inline_result chat", ctx1.chat);
 
-		const result = await textAnswer(ID_PREFIX + text);
-		ctx.reply(result);
-	});
+	// 	const text = ctx1.chosenInlineResult.query;
+	// 	console.log("chosen_inline_result:", text);
+
+	// 	const result = await textAnswer(ID_PREFIX + text);
+	// 	ctx.reply(result);
+	// });
 });
 
 bot.on("callback_query", async (ctx) => {
+	console.log("callback_query chat", ctx.chat);
+
 	console.log("callback query ctx: ", ctx);
 	console.log("callback query: ", ctx.callbackQuery);
 
@@ -212,18 +232,22 @@ bot.on("callback_query", async (ctx) => {
 	}
 });
 
-bot.on("chosen_inline_result", ({ chosenInlineResult, update }) => {
+bot.on("chosen_inline_result", (ctx) => {
+	console.log("chosen_inline_result chat", ctx.chat);
 	// console.log("chosen inline result", chosenInlineResult);
 	// console.log("chosen inline update", update);
+	// const result = update.chosen_inline_result;
+	// const resultId = result.result_id;
+	// const query = result.query;
+	// const user = result.from.id;
+	// bot.telegram.sendMessage(
+	// 	user,
+	// 	((text = "fetching data with id: " + resultId), "query: " + query)
+	// );
+});
 
-	const result = update.chosen_inline_result;
-	const resultId = result.result_id;
-	const query = result.query;
-	const user = result.from.id;
-	bot.telegram.sendMessage(
-		user,
-		((text = "fetching data with id: " + resultId), "query: " + query)
-	);
+bot.on("message", async (ctx) => {
+	console.log("message", ctx.chat);
 });
 
 bot.launch().then(() => {
