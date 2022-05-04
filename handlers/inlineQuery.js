@@ -23,7 +23,7 @@ const inlineQuery = async (ctx, api) => {
 			// description: item.description,
 			input_message_content: {
 				message_text: JSON.stringify(formatAnswer(item)),
-				parse_mode: "HTML", // MarkdownV2
+				parse_mode: "MarkdownV2", // MarkdownV2
 				disable_web_page_preview: true,
 			},
 			disable_web_page_preview: true,

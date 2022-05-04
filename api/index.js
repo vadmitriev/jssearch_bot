@@ -46,6 +46,7 @@ class Api {
 			);
 			return description;
 		};
+
 		const resultWithDescription = await Promise.allSettled(
 			data.map(async (item, idx) => {
 				if (!item.description) {
@@ -63,11 +64,15 @@ class Api {
 				return item;
 			})
 		);
+
 		return resultWithDescription.map((promise) => promise.value);
 	}
 
-	async filterByQuery(data = [], query = this.query) {
+	filterByQuery(data = [], query = this.query) {
 		return data.filter((item, idx) => {
+			if (!item.title) {
+				console.log("hmm", item);
+			}
 			const check = item.title
 				.toLowerCase()
 				.includes(query.toLowerCase());
@@ -103,8 +108,8 @@ class Api {
 				this.query.toLowerCase() !== query.toLowerCase();
 
 			if (needFilter) {
-				const filteredItems = await this.filterByQuery(this.db, query);
-				const results = { data: filteredItems, page: 0 };
+				const filteredItems = this.filterByQuery(this.db, query);
+				const results = { data: filteredItems, page: 1 };
 				this.selectedResults[query] = results;
 			}
 

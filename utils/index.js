@@ -1,31 +1,43 @@
 const { API_URL } = require("./../constants");
 
 const formatAnswer = (item) => {
-	return `*${item?.title}*\n${API_URL + item?.url}\n${item?.description}
+	return `<b>${item?.title}</b>\n${API_URL + item?.url}\n${item?.description}
 		`;
 };
 
 const formKeyboard = (query, page = 1, pageCount = 1) => {
-	// const pages = [...Array.from({ length: pageCount }, (_, i) => i + 1)].map(
-	// 	(number) => ({ text: number, callback_data: number })
-	// );
+	const firstButton =
+		page === 1
+			? null
+			: {
+					text: "◀️",
+					callback_data: `${query}|prev`,
+			  };
 
-	const keyboard = [
-		[
-			{
-				text: page < 1 ? "◀️" : "❌",
-				callback_data: `${query}|prev`,
-			},
-			{
-				text: `${page}/${pageCount}`,
-				callback_data: `${query}|${page}`,
-			},
-			{
-				text: page < pageCount ? "▶️" : "❌",
-				callback_data: `${query}|next`,
-			},
-		],
-	];
+	const currentPageButton = {
+		text: `${page}/${pageCount}`,
+		callback_data: `${query}|${page}`,
+	};
+
+	const lastButton =
+		page === pageCount
+			? null
+			: {
+					text: "▶️",
+					callback_data: `${query}|next`,
+			  };
+
+	const keyboard = [];
+
+	if (firstButton) {
+		keyboard.push(firstButton);
+	}
+
+	keyboard.push(currentPageButton);
+
+	if (lastButton) {
+		keyboard.push(lastButton);
+	}
 
 	return keyboard;
 };
