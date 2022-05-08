@@ -4,13 +4,14 @@ const utils_1 = require("./../utils");
 const telegraf_1 = require("telegraf");
 const text = async (ctx, api) => {
     const myId = ctx.botInfo.id;
-    const messageFromBot = ctx.message.from.is_bot && ctx.message.from.id === myId;
+    const message = ctx.message;
+    const messageFromBot = message?.via_bot?.id === myId;
     const chatId = ctx.chat.id;
     if (messageFromBot) {
         return;
     }
     try {
-        const text = ctx.message.text;
+        const text = message.text;
         const data = await api.findInDb({
             query: text,
             loadDescription: false,
