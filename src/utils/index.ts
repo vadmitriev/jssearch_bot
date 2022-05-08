@@ -1,4 +1,10 @@
-const formKeyboard = (query, page = 1, pageCount = 1) => {
+import { DataItem } from '../types';
+
+export const formKeyboard = (
+  query: string,
+  page = 1,
+  pageCount = 1,
+) => {
   if (pageCount <= 1) {
     return false;
   }
@@ -39,15 +45,18 @@ const formKeyboard = (query, page = 1, pageCount = 1) => {
   return keyboard;
 };
 
-const escapeString = (str) => {
+export const escapeString = (str: string) => {
   return str.replaceAll(/\</g, '');
 };
 
-const formatAnswer = (item) => {
+export const formatAnswer = (item: DataItem) => {
   return `<a href="${item.url}">${escapeString(item.title)}</a>\n`;
 };
 
-const textAnswer = async (text = '', data = []) => {
+export const textAnswer = async (
+  text = '',
+  data: DataItem[] = [],
+) => {
   if (!text) return;
 
   if (!data.length) {
@@ -57,8 +66,15 @@ const textAnswer = async (text = '', data = []) => {
   return data.map(formatAnswer).join('');
 };
 
-const sortByRelevance = (data, key, query = '') => {
+export const sortByRelevance = (
+  data: DataItem[] = [],
+  key: keyof DataItem,
+  query = '',
+) => {
+  if (!data.length) return [];
+
   query = query.toLowerCase();
+
   const rankedList = data.map((entry) => {
     let points = 0;
 
@@ -78,12 +94,4 @@ const sortByRelevance = (data, key, query = '') => {
   });
 
   return rankedList.sort((a, b) => b.points - a.points);
-};
-
-module.exports = {
-  textAnswer,
-  formKeyboard,
-  formatAnswer,
-  escapeString,
-  sortByRelevance,
 };

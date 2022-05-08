@@ -1,7 +1,9 @@
-const { formKeyboard, textAnswer } = require('./../utils');
-const { Markup } = require('telegraf');
+import Api from '../api';
 
-const callbackQuery = async (ctx, api) => {
+import { formKeyboard, textAnswer } from './../utils';
+import { Markup, Context } from 'telegraf';
+
+const callbackQuery = async (ctx: Context, api: Api) => {
   try {
     const query = ctx.callbackQuery.data;
 
@@ -11,8 +13,8 @@ const callbackQuery = async (ctx, api) => {
     const currentPage = api.getCurrentPage(text);
     const pageCount = api.getPageCount(text);
 
-    const chatId = ctx.update.callback_query.message.chat.id;
-    const messageId = ctx.update.callback_query.message.message_id;
+    const chatId = ctx.callbackQuery.message.chat.id;
+    const messageId = ctx.callbackQuery.message.message_id;
     const inlineMessageId = '';
 
     const replyNewAnswer = async () => {
@@ -28,6 +30,9 @@ const callbackQuery = async (ctx, api) => {
 
       if (data.length) {
         const keyboard = formKeyboard(text, newPage, pageCount);
+        if (!keyboard) {
+          return;
+        }
         const markup = Markup.inlineKeyboard(keyboard);
 
         return ctx.telegram.editMessageText(
@@ -64,12 +69,10 @@ const callbackQuery = async (ctx, api) => {
           show_alert: false,
         });
     }
-  } catch (e) {
+  } catch (e: any) {
     console.log('Callback query error: ', e);
-    ctx.reply(`An error occured: ${e.message}`);
+    ctx.reply(`An error occured: ${e?.message}`);
   }
 };
 
-module.exports = {
-  callbackQuery,
-};
+export default callbackQuery;

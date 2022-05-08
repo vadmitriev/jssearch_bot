@@ -1,29 +1,35 @@
-const cheerio = require('cheerio');
-const axios = require('axios');
+import cheerio from 'cheerio';
+import axios from 'axios';
 
-const { API_URL } = require('../constants');
-const { sortByRelevance } = require('../utils');
+import { API_URL } from '../constants';
+import { sortByRelevance } from '../utils';
+import { DataItem } from '../types';
 
-class Api {
-  selectedResults = {};
+interface SelectedItems {
+  data: DataItem[];
+  page: number;
+}
+
+export default class Api {
+  selectedResults: { [query: string]: SelectedItems } = {};
   itemsPerPage = 15;
   page = 1;
-  db = [];
-  indexes = []; // {[query]: page,}
+  db: DataItem[] = [];
+  indexes: { [query: string]: number[] } = {};
   query = '';
 
   constructor() {}
 
   async fetchDb() {
     const res = await axios.get(API_URL + '/en-US/search-index.json');
-    this.db = res.data.map((item) => ({
+    this.db = res.data.map((item: DataItem) => ({
       ...item,
       url: API_URL + item.url,
     }));
   }
 
-  async fetchDescription(data) {
-    const loadDescription = async (url) => {
+  async fetchDescription(data: DataItem[]) {
+    const loadDescription = async (url: string) => {
       const html = await axios.get(url);
       const $ = cheerio.load(html.data);
       const description = $('meta[property="og:description"]').attr(
@@ -54,7 +60,7 @@ class Api {
     );
   }
 
-  filterByQuery(data = [], query = this.query) {
+  filterByQuery(data: DataItem[] = [], query = this.query) {
     query = query.toLowerCase();
     const result = data.filter((item, idx) => {
       const check = item.title.toLowerCase().includes(query);
@@ -118,11 +124,11 @@ class Api {
     }
   }
 
-  async saveinDb(chatId, message) {
+  async saveinDb(chatId: string, message: string | string[]) {
     // TODO
   }
 
-  setPage(query, page) {
+  setPage(query: string, page: number) {
     const results = this.selectedResults[query];
     if (results) {
       results.page = page;
@@ -141,7 +147,7 @@ class Api {
     return 0;
   }
 
-  getPageCount(query) {
+  getPageCount(query: string) {
     const results = this.selectedResults[query];
     if (!results) {
       return 0;
@@ -149,11 +155,7 @@ class Api {
     return Math.floor(results.data.length / this.itemsPerPage);
   }
 
-  getSelectedResults(query) {
+  getSelectedResults(query: string) {
     return this.selectedResults[query];
   }
 }
-
-module.exports = {
-  Api,
-};

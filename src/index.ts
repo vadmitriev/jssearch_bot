@@ -1,16 +1,18 @@
 require('dotenv').config();
-const { Telegraf } = require('telegraf');
-const { Api } = require('./api');
+import { Telegraf, Context } from 'telegraf';
+import Api from './api';
 
-const {
+import {
   startHandler,
   textHandler,
   helpHandler,
   callbackQueryHandler,
   inlineQueryHandler,
-} = require('./handlers');
+} from './handlers';
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const bot: Telegraf<Context> = new Telegraf(
+  process.env.BOT_TOKEN as string,
+);
 const api = new Api();
 
 bot.telegram.setMyCommands([
@@ -18,9 +20,9 @@ bot.telegram.setMyCommands([
   { command: '/help', description: 'Help' },
 ]);
 
-bot.start((ctx) => startHandler(ctx, api));
+bot.start((ctx) => startHandler(ctx));
 
-bot.help((ctx) => helpHandler(ctx, api));
+bot.help((ctx) => helpHandler(ctx));
 
 bot.on('text', (ctx) => textHandler(ctx, api));
 

@@ -1,10 +1,10 @@
-const help = (ctx) => {
+import { Context } from 'telegraf';
+
+const help = (ctx: Context) => {
   ctx.reply(
     `Hello ${ctx.from.first_name}!
 	Just write what do you want to find about web development`,
   );
 };
 
-module.exports = {
-  help,
-};
+export default help;
