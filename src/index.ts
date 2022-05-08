@@ -1,6 +1,6 @@
-require('dotenv').config();
 import { Telegraf, Context } from 'telegraf';
 import Api from './api';
+import config from './config';
 
 import {
   startHandler,
@@ -10,9 +10,7 @@ import {
   inlineQueryHandler,
 } from './handlers';
 
-const bot: Telegraf<Context> = new Telegraf(
-  process.env.BOT_TOKEN as string,
-);
+const bot: Telegraf<Context> = new Telegraf(config.token);
 const api = new Api();
 
 bot.telegram.setMyCommands([

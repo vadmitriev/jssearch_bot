@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require('dotenv').config();
 const telegraf_1 = require("telegraf");
 const api_1 = __importDefault(require("./api"));
+const config_1 = __importDefault(require("./config"));
 const handlers_1 = require("./handlers");
-const bot = new telegraf_1.Telegraf(process.env.BOT_TOKEN);
+const bot = new telegraf_1.Telegraf(config_1.default.token);
 const api = new api_1.default();
 bot.telegram.setMyCommands([
     { command: '/start', description: 'Start' },
