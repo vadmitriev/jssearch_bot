@@ -1,4 +1,4 @@
-import { formKeyboard, textAnswer } from './../utils';
+import { formKeyboard, textAnswer } from '../utils';
 import { Markup, Context } from 'telegraf';
 import { Message } from 'typegram';
 import Api from '../api';
@@ -24,11 +24,11 @@ const text = async (ctx: Context, api: Api) => {
     });
     const result = await textAnswer(text, data);
 
-    const page = api.getCurrentPage(text);
+    api.setPage(text, 1);
     const pageCount = api.getPageCount(text);
 
     if (data.length) {
-      const keyboard = formKeyboard(text, page, pageCount);
+      const keyboard = formKeyboard(text, 1, pageCount);
       if (!keyboard) {
         return;
       }

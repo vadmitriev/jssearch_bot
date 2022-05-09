@@ -32,10 +32,7 @@ export default class Api {
     const loadDescription = async (url: string) => {
       const html = await axios.get(url);
       const $ = cheerio.load(html.data);
-      const description = $('meta[property="og:description"]').attr(
-        'content',
-      );
-      return description;
+      return $('meta[property="og:description"]').attr('content');
     };
 
     const resultWithDescription = await Promise.allSettled(
@@ -100,8 +97,10 @@ export default class Api {
 
       if (needFilter) {
         const filteredItems = this.filterByQuery(this.db, query);
-        const results = { data: filteredItems, page: 1 };
-        this.selectedResults[query] = results;
+        this.selectedResults[query] = {
+          data: filteredItems,
+          page: 1,
+        };
       }
 
       const start = (page - 1) * itemsPerPage;

@@ -1,6 +1,6 @@
 import Api from '../api';
 
-import { formKeyboard, textAnswer } from './../utils';
+import { formKeyboard, textAnswer } from '../utils';
 import { Markup, Context } from 'telegraf';
 
 const callbackQuery = async (ctx: Context, api: Api) => {

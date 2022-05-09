@@ -6,8 +6,7 @@ const inlineQuery = async (ctx: Context, api: Api) => {
   const text = ctx.inlineQuery.query;
 
   if (!text.length) {
-    ctx.answerInlineQuery([]);
-    return;
+    return ctx.answerInlineQuery([]);
   }
 
   try {
@@ -42,7 +41,7 @@ const inlineQuery = async (ctx: Context, api: Api) => {
         message_text: 'Nothing was found',
       },
     }));
-    ctx.answerInlineQuery(answer);
+    return ctx.answerInlineQuery(answer);
   }
 };
 
