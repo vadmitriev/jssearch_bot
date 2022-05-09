@@ -14,11 +14,11 @@
 
 ## Запуск
 ```console
-git clone https://github.com/vadmitriev/jssearch
+git clone https://github.com/vadmitriev/jssearch_bot
 ```
 
 ```console
-cd jssearch
+cd jssearch_bot
 ```
 
 ```console
